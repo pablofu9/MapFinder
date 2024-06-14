@@ -12,16 +12,18 @@ import SwiftUI
 struct SearchRowView: View {
     
     let placeMark: CLPlacemark
+    let pointOfInterestCategorie: PointOfInterestCategory
     
     var body: some View {
         VStack(alignment: .leading) {
-            HStack(spacing: 20) {
-                Image(systemName: "mappin.circle.fill")
+            
+            HStack(spacing: 30) {
+                Image(systemName: pointOfInterestCategorie.imageName)
                     .resizable()
                     .renderingMode(.template)
-                    .frame(width: 40, height: 40)
+                    .frame(width: 25, height: 25)
                     .font(.title)
-                    .foregroundStyle(.red.opacity(0.6))
+                    .foregroundStyle(pointOfInterestCategorie.color)
                 VStack(alignment: .leading,spacing: 6) {
                     Text(placeMark.name ?? "")
                         .lineLimit(1)
@@ -31,23 +33,14 @@ struct SearchRowView: View {
                         .lineLimit(1)
                         .font(.body)
                         .foregroundStyle(.black)
-
                 }
-                Spacer()
             }
-            .padding(.vertical, 6)
-            .padding(.leading, 55)
-            
         }
-        .frame(maxWidth: .infinity, maxHeight: 100)
-        .background {
-            RoundedRectangle(cornerRadius: 20)
-                .fill(.gray.opacity(0.5))
-                .padding(.horizontal, 40)
-        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+
     }
 }
 
 #Preview {
-    SearchRowView(placeMark: CLPlacemark.example)
+    SearchRowView(placeMark: CLPlacemark.example, pointOfInterestCategorie: .airport)
 }

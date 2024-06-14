@@ -17,6 +17,7 @@ class LocationManager: NSObject, ObservableObject, MKMapViewDelegate, CLLocation
     @Published var mapView: MKMapView = .init()
     @Published var manager: CLLocationManager = .init()
     
+    @Published var pointOfInterestCategories: [MKPointOfInterestCategory]?
     
     // MARK: - Search
     @Published var searchText: String = ""
@@ -26,6 +27,8 @@ class LocationManager: NSObject, ObservableObject, MKMapViewDelegate, CLLocation
     
     @Published var pickedLocation: CLLocation?
     @Published var pickedPlaceMark: CLPlacemark?
+    let defaultLocation = CLLocationCoordinate2D(latitude: 41.65518, longitude: -4.72372)
+    
     override init() {
         super.init()
         manager.delegate = self
@@ -41,6 +44,7 @@ class LocationManager: NSObject, ObservableObject, MKMapViewDelegate, CLLocation
                     self.fetchedPlaces = nil
                 }
             })
+        
     }
     
     func fetchPlaces(value: String) {
@@ -48,11 +52,17 @@ class LocationManager: NSObject, ObservableObject, MKMapViewDelegate, CLLocation
             do {
                 let request = MKLocalSearch.Request()
                 request.naturalLanguageQuery = value.lowercased()
+                let region = MKCoordinateRegion(
+                    center: userLocation?.coordinate ?? defaultLocation,
+                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+                )
+                request.region = region
+
                 let response = try await MKLocalSearch(request: request).start()
                 await MainActor.run(body: {
-                    self.fetchedPlaces = response.mapItems.compactMap({ item -> CLPlacemark? in
-                        return item.placemark
-                    })
+                    self.fetchedPlaces = response.mapItems.compactMap { $0.placemark }
+                    self.pointOfInterestCategories = response.mapItems.compactMap { $0.pointOfInterestCategory }
+                    
                 })
             } catch {
                 await MainActor.run(body: {

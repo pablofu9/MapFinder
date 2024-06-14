@@ -7,6 +7,7 @@
 
 import SwiftUI
 import MapKit
+import Combine
 
 struct ContentView: View {
     
@@ -14,7 +15,8 @@ struct ContentView: View {
     @State private var isPresented: Bool = false
     @State private var offset: CGFloat = .zero
     @State private var isExpanded: Bool = true
-    
+    @State private var keyboardHeight: CGFloat = 0
+
     init() {
         UISearchBar.appearance().setImage(searchBarImage(), for: .search, state: .normal)
         UITextField.appearance(whenContainedInInstancesOf: [UISearchBar.self]).backgroundColor = .white.withAlphaComponent(0.6)
@@ -31,52 +33,40 @@ struct ContentView: View {
                     .environmentObject(locationManager)
                     .onTapGesture {
                         withAnimation(.linear.delay(0.2)) {
+                            locationManager.fetchedPlaces?.removeAll()
                             isPresented = false
                         }
                     }
-                if let place = locationManager.pickedPlaceMark {
-                    ZStack {
-                        bottomCard(placeMark: place)
-                            .offset(y: offset)
-                        if !isExpanded {
-                            buttonToResetOffset
-                                .padding(.top, 30)
-                        }
-                    }
-                }
+                bottomCardViewOrButton
+              
                 VStack {
                    
                     if let places = locationManager.fetchedPlaces, !places.isEmpty {
                             VStack(alignment: .leading) {
-                                ScrollView {
-                                    ForEach(places, id: \.self) { place in
-                                        Button {
-                                            if let coordinate = place.location?.coordinate {
-                                                setPlaceInMap(coordinate: coordinate)
-                                                withAnimation(.linear.delay(0.2)) {
-                                                    locationManager.searchText = ""
-                                                    isPresented = false
-                                                }
-                                            }
-                                        } label: {
-                                            SearchRowView(placeMark: place)
+                                
+                                List {
+                                    Section {
+                                        ForEach(places, id: \.self) { place in
+                                           getListButton(place: place)
                                         }
+                                        .listRowBackground(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .fill(Color.white.opacity(0.5))
+                                                .padding(2)
+                                        )
+                                    } header: {
+                                        Text("Results")
+                                            .foregroundStyle(.black.opacity(0.7))
                                     }
+                                   
                                 }
+                                .padding(.top, UIScreen.main.bounds.height / 7)
+                                .scrollContentBackground(.hidden)
+                                .background(Color.gray.opacity(0.5).edgesIgnoringSafeArea(.all))
                             }
                             .opacity(locationManager.searchText.isEmpty ? 0 : 1)
-                            .padding(.vertical, 10)
-                            .background {
-                                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                                    .fill(.white.opacity(0.5))
-                                    .padding(.horizontal, 20)
-                            }
-                            .padding(.top, UIScreen.main.bounds.height / 7)
-                            .padding(.bottom, 400)
-                            
+                            .padding(.bottom, keyboardHeight - 50)
                     }
-                    
-                   
                 }
                 .searchable(text: $locationManager.searchText, isPresented: $isPresented)
                 .frame(maxHeight: .infinity, alignment: .top)
@@ -88,6 +78,9 @@ struct ContentView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .ignoresSafeArea()
+            .onReceive(Publishers.keyboardHeight) { keyboardHeight in
+                self.keyboardHeight = keyboardHeight
+            }
            
         }
         .ignoresSafeArea()
@@ -103,6 +96,7 @@ struct ContentView: View {
         locationManager.mapView.region = .init(center: coordinate, latitudinalMeters: 1000, longitudinalMeters: 1000)
         locationManager.addDraggablePin(coordinate: coordinate)
         locationManager.updatePlaceMark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude))
+        
     }
     
     @ViewBuilder
@@ -212,6 +206,41 @@ struct ContentView: View {
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
                         .fill(.green.opacity(0.7))
                 }
+        }
+    }
+    
+    @ViewBuilder
+    private var bottomCardViewOrButton: some View {
+        if let place = locationManager.pickedPlaceMark {
+            ZStack {
+                bottomCard(placeMark: place)
+                    .offset(y: offset)
+                if !isExpanded {
+                    buttonToResetOffset
+                        .padding(.top, 30)
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func getListButton(place: CLPlacemark) -> some View {
+        Button {
+            if let coordinate = place.location?.coordinate {
+                
+                setPlaceInMap(coordinate: coordinate)
+                withAnimation(.linear.delay(0.2)) {
+                    locationManager.searchText = ""
+                    isPresented = false
+                }
+            }
+        } label: {
+            if let pointOfInterestCategory = locationManager.pointOfInterestCategories?.first {
+                let category = PointOfInterestCategory.fromString(pointOfInterestCategory.rawValue) ?? .unknown
+                SearchRowView(placeMark: place, pointOfInterestCategorie: category)
+            } else {
+                SearchRowView(placeMark: place, pointOfInterestCategorie: .unknown)
+            }
         }
     }
 }
