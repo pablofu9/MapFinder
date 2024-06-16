@@ -17,19 +17,25 @@ class LocationManager: NSObject, ObservableObject, MKMapViewDelegate, CLLocation
     @Published var mapView: MKMapView = .init()
     @Published var manager: CLLocationManager = .init()
     
-    @Published var pointOfInterestCategories: [MKPointOfInterestCategory]?
     
     // MARK: - Search
     @Published var searchText: String = ""
     var cancellable: AnyCancellable?
-    @Published var fetchedPlaces: [CLPlacemark]?
+    @Published var fetchedPlaces: [Place] = []
     @Published var userLocation: CLLocation?
     
     @Published var pickedLocation: CLLocation?
     @Published var pickedPlaceMark: CLPlacemark?
     let defaultLocation = CLLocationCoordinate2D(latitude: 41.65518, longitude: -4.72372)
     
+    @Published var favPlaces: [Place] {
+        didSet {
+            
+        }
+    }
+    
     override init() {
+        self.favPlaces = UserDefaults.standard.placesFavorties
         super.init()
         manager.delegate = self
         mapView.delegate = self
@@ -41,9 +47,35 @@ class LocationManager: NSObject, ObservableObject, MKMapViewDelegate, CLLocation
                 if value != "" {
                     self.fetchPlaces(value: value)
                 } else {
-                    self.fetchedPlaces = nil
+                    self.fetchedPlaces = []
                 }
             })
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(mapTapped(_:)))
+        mapView.addGestureRecognizer(tapGesture)
+        DispatchQueue.main.async {
+            NotificationCenter.default.addObserver(self, selector: #selector(self.userDefaultsDidChange), name: UserDefaults.didChangeNotification, object: nil)
+        }
+        
+    }
+    
+    @objc func userDefaultsDidChange(_ notification: Notification) {
+        DispatchQueue.main.async {
+            self.favPlaces = UserDefaults.standard.placesFavorties
+        }
+    }
+    
+    @objc private func mapTapped(_ sender: UITapGestureRecognizer) {
+        let location = sender.location(in: mapView)
+        let coordinate = mapView.convert(location, toCoordinateFrom: mapView)
+        setPlaceInMap(coordinate: coordinate)
+    }
+    
+     func setPlaceInMap(coordinate: CLLocationCoordinate2D) {
+        removeAnnotations()
+        pickedLocation = .init(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        mapView.region = .init(center: coordinate, latitudinalMeters: 3000, longitudinalMeters: 3000)
+        addDraggablePin(coordinate: coordinate)
+        updatePlaceMark(location: .init(latitude: coordinate.latitude, longitude: coordinate.longitude))
         
     }
     
@@ -51,27 +83,40 @@ class LocationManager: NSObject, ObservableObject, MKMapViewDelegate, CLLocation
         Task {
             do {
                 let request = MKLocalSearch.Request()
-                request.naturalLanguageQuery = value.lowercased()
+                request.naturalLanguageQuery = value
                 let region = MKCoordinateRegion(
                     center: userLocation?.coordinate ?? defaultLocation,
                     span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
                 )
                 request.region = region
-
+                request.resultTypes = .pointOfInterest
                 let response = try await MKLocalSearch(request: request).start()
                 await MainActor.run(body: {
-                    self.fetchedPlaces = response.mapItems.compactMap { $0.placemark }
-                    self.pointOfInterestCategories = response.mapItems.compactMap { $0.pointOfInterestCategory }
-                    
+                    self.fetchedPlaces = response.mapItems.compactMap { item -> Place? in
+                        guard let category = item.pointOfInterestCategory else { return nil }
+                        return Place(placemark: item.placemark, category: category)
+                    }
                 })
             } catch {
                 await MainActor.run(body: {
-                    self.fetchedPlaces = nil
+                    self.fetchedPlaces = []
                 })
             }
         }
     }
     
+    func placeIsFavorite(place: Place) -> Bool {
+        return UserDefaults.standard.placesFavorties.contains { $0.placemark.name == place.placemark.name }
+    }
+    
+    func manageFavorite(place: Place) {
+        if let index = UserDefaults.standard.placesFavorties.firstIndex(where: { $0.placemark.name == place.placemark.name }) {
+            UserDefaults.standard.placesFavorties.remove(at: index)
+        } else {
+            UserDefaults.standard.placesFavorties.append(place)
+        }
+    }
+
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: any Error) {
         // Handle errors
@@ -140,6 +185,10 @@ class LocationManager: NSObject, ObservableObject, MKMapViewDelegate, CLLocation
                 
             }
         }
+    }
+    
+    func removeAnnotations() {
+        mapView.removeAnnotations(mapView.annotations)
     }
     
 }

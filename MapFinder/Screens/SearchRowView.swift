@@ -29,7 +29,7 @@ struct SearchRowView: View {
                         .lineLimit(1)
                         .font(.title3)
                         .foregroundStyle(.black)
-                    Text(placeMark.administrativeArea ?? "")
+                    Text("\(placeMark.administrativeArea ?? ""), \(placeMark.country ?? "")")
                         .lineLimit(1)
                         .font(.body)
                         .foregroundStyle(.black)

@@ -27,3 +27,26 @@ extension CLPlacemark {
         return MKPlacemark(coordinate: CLLocationCoordinate2D(latitude: 37.33182, longitude: -122.03118), addressDictionary: addressDictionary)
     }
 }
+
+extension MKPlacemark {
+    func encode() -> Data? {
+        try? NSKeyedArchiver.archivedData(withRootObject: self, requiringSecureCoding: false)
+    }
+    
+    static func decode(from data: Data) -> MKPlacemark? {
+        try? NSKeyedUnarchiver.unarchivedObject(ofClass: MKPlacemark.self, from: data)
+    }
+}
+
+extension MKPointOfInterestCategory: Codable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let rawValue = try container.decode(String.self)
+        self.init(rawValue: rawValue)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
+    }
+}
