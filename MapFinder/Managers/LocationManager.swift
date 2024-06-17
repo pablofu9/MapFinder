@@ -2,9 +2,10 @@
 //  LocationManager.swift
 //  MapFinder
 //
-//  Created by Pablo Fuertes on 13/6/24.
+//  Created by Pablo Fuertes on 17/6/24.
 //
 
+import Foundation
 import Foundation
 import SwiftUI
 import CoreLocation

@@ -1,18 +1,21 @@
 //
-//  ContentView.swift
+//  HomeView.swift
 //  MapFinder
 //
-//  Created by Pablo Fuertes on 13/6/24.
+//  Created by Pablo Fuertes on 17/6/24.
 //
+
+import Foundation
 
 import SwiftUI
 import MapKit
 import Combine
 
-struct ContentView: View {
+struct HomeView: View {
     
     // MARK: - Properties
     @StateObject var locationManager: LocationManager = .init()
+    @StateObject var weatherManager = WeatherManager()
     @State private var isPresented: Bool = false
     @State private var offset: CGFloat = .zero
     @State private var isExpanded: Bool = true
@@ -36,6 +39,13 @@ struct ContentView: View {
                 FavoritesView()
                     .environmentObject(locationManager)
             })
+            .overlay {
+                if weatherManager.loading {
+                    LoadingView()
+                }
+            }
+        
+           
     }
     
     // MARK: - Subviews
@@ -118,6 +128,7 @@ struct ContentView: View {
            
         }
         .ignoresSafeArea()
+        .navigationBarBackButtonHidden()
     }
     
     /// Button to go to current location
@@ -265,13 +276,19 @@ struct ContentView: View {
     @ViewBuilder
     private var moreInfoButton: some View {
         Button {
-            
+            Task {
+                do {
+                    if let selectedPlace = selectedPlace {
+                        try await weatherManager.getWeather(coordinates: selectedPlace.placemark.coordinate)
+                    }
+                }
+            }
         } label: {
             HStack {
-                Image(systemName: "info.circle.fill")
+                Image(systemName: "thermometer.sun")
                     .font(.title2)
                     .foregroundStyle(.white)
-                Text("See more info")
+                Text("See weather details")
                     .font(.title3)
                     .foregroundStyle(.white)
             }
@@ -353,9 +370,9 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    HomeView()
 }
 
 #Preview {
-    ContentView().bottomCard(placeMark: .example)
+    HomeView().bottomCard(placeMark: .example)
 }

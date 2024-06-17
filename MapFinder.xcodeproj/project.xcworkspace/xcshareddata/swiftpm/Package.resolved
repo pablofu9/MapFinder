@@ -1,0 +1,33 @@
+{
+  "originHash" : "4ed5addbdf06eeb12ea9f4d5b14eac5c5f07dd43f6dbbc5450030a20ccc8a90a",
+  "pins" : [
+    {
+      "identity" : "flatbuffers",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/google/flatbuffers.git",
+      "state" : {
+        "revision" : "595bf0007ab1929570c7671f091313c8fc20644e",
+        "version" : "24.3.25"
+      }
+    },
+    {
+      "identity" : "lottie-spm",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/airbnb/lottie-spm.git",
+      "state" : {
+        "revision" : "1d29eccc24cc8b75bff9f6804155112c0ffc9605",
+        "version" : "4.4.3"
+      }
+    },
+    {
+      "identity" : "sdk",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/open-meteo/sdk.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "f166b8d170575c55a961da5c9fd54897de643f17"
+      }
+    }
+  ],
+  "version" : 3
+}
