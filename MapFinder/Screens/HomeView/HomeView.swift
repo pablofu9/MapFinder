@@ -10,6 +10,7 @@ import Foundation
 import SwiftUI
 import MapKit
 import Combine
+import Lottie
 
 struct HomeView: View {
     
@@ -23,6 +24,7 @@ struct HomeView: View {
     @Environment(\.safeAreaInsets) private var safeAreaInsets
     @State var selectedPlace: Place?
     @State var seeFavPlaces: Bool = false
+    
     
     // MARK: - Init
     init() {
@@ -44,6 +46,11 @@ struct HomeView: View {
                     LoadingView()
                 }
             }
+            .sheet(isPresented: $weatherManager.seeWeather, content: {
+                if let weatherResponse = weatherManager.weatherResponse, let place = selectedPlace {
+                    WeatherDetail(weatherResponse: weatherResponse, place: place)
+                }
+            })
         
            
     }
@@ -199,6 +206,7 @@ struct HomeView: View {
            
             }
             moreInfoButton
+            LottieIcon
            Spacer()
         }
        
@@ -208,6 +216,7 @@ struct HomeView: View {
                 .fill(.white.opacity(0.9))
                 .shadow(color: .black.opacity(0.3), radius: 5)
         }
+        
         .gesture(createDragGesture(isExpanded: $isExpanded))
         
     }
@@ -324,6 +333,13 @@ struct HomeView: View {
                 
             }
         }
+    }
+    
+    /// Logo icon
+    @ViewBuilder
+    private var LottieIcon: some View {
+        LottieView(animation: .named("SunRain"))
+          .playing(loopMode: .loop)
     }
     
     // MARK: - Private functions

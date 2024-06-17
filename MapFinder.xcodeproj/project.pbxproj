@@ -13,6 +13,8 @@
 		91C8056E2C1F9662000C9CF9 /* FavoritesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91C8056D2C1F9662000C9CF9 /* FavoritesView.swift */; };
 		91D4E1522C1C596500B975CA /* PointOfInterest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D4E1512C1C596500B975CA /* PointOfInterest.swift */; };
 		91D4E1542C1C6AF900B975CA /* Publishers+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D4E1532C1C6AF900B975CA /* Publishers+Utils.swift */; };
+		91DD08152C2044200057E998 /* SunRain.json in Resources */ = {isa = PBXBuildFile; fileRef = 91DD08142C20441F0057E998 /* SunRain.json */; };
+		91DD08182C2045DD0057E998 /* WeatherDetail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91DD08172C2045DD0057E998 /* WeatherDetail.swift */; };
 		91E02B4C2C20151D00968775 /* ApiCall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E02B4B2C20151D00968775 /* ApiCall.swift */; };
 		91E02B4E2C20152E00968775 /* WebRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E02B4D2C20152E00968775 /* WebRepository.swift */; };
 		91E02B512C20158400968775 /* DepdencyInjector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91E02B502C20158400968775 /* DepdencyInjector.swift */; };
@@ -48,6 +50,8 @@
 		91C8056D2C1F9662000C9CF9 /* FavoritesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesView.swift; sourceTree = "<group>"; };
 		91D4E1512C1C596500B975CA /* PointOfInterest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PointOfInterest.swift; sourceTree = "<group>"; };
 		91D4E1532C1C6AF900B975CA /* Publishers+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Publishers+Utils.swift"; sourceTree = "<group>"; };
+		91DD08142C20441F0057E998 /* SunRain.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = SunRain.json; sourceTree = "<group>"; };
+		91DD08172C2045DD0057E998 /* WeatherDetail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherDetail.swift; sourceTree = "<group>"; };
 		91E02B4B2C20151D00968775 /* ApiCall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiCall.swift; sourceTree = "<group>"; };
 		91E02B4D2C20152E00968775 /* WebRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebRepository.swift; sourceTree = "<group>"; };
 		91E02B502C20158400968775 /* DepdencyInjector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DepdencyInjector.swift; sourceTree = "<group>"; };
@@ -106,6 +110,14 @@
 				91E02B5C2C20171C00968775 /* PointOfInterest */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		91DD08162C2045CC0057E998 /* WeatherDetail */ = {
+			isa = PBXGroup;
+			children = (
+				91DD08172C2045DD0057E998 /* WeatherDetail.swift */,
+			);
+			path = WeatherDetail;
 			sourceTree = "<group>";
 		};
 		91E02B4A2C20150200968775 /* Networking */ = {
@@ -195,6 +207,7 @@
 		91E02B732C2026DC00968775 /* Lotties */ = {
 			isa = PBXGroup;
 			children = (
+				91DD08142C20441F0057E998 /* SunRain.json */,
 				91E02B812C20293D00968775 /* plane.json */,
 				91E02B762C20275B00968775 /* world.json */,
 			);
@@ -277,6 +290,7 @@
 		91FDE6282C1B45CA00FC725D /* Screens */ = {
 			isa = PBXGroup;
 			children = (
+				91DD08162C2045CC0057E998 /* WeatherDetail */,
 				91E02B792C20276A00968775 /* SplashScreen */,
 				91E02B562C20160800968775 /* FavoritesView */,
 				91E02B552C2015FA00968775 /* SearchRowView */,
@@ -362,6 +376,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				91E02B782C20275B00968775 /* world.json in Resources */,
+				91DD08152C2044200057E998 /* SunRain.json in Resources */,
 				91FDE61B2C1B3CBC00FC725D /* Preview Assets.xcassets in Resources */,
 				91E02B822C20293D00968775 /* plane.json in Resources */,
 				91FDE6182C1B3CBC00FC725D /* Assets.xcassets in Resources */,
@@ -381,6 +396,7 @@
 				91E02B722C2022B100968775 /* WeatherManager.swift in Sources */,
 				91E02B7E2C2027C600968775 /* SplashScreenVM.swift in Sources */,
 				91FDE6272C1B440500FC725D /* MapView.swift in Sources */,
+				91DD08182C2045DD0057E998 /* WeatherDetail.swift in Sources */,
 				91FDE6142C1B3CBB00FC725D /* MapFinderApp.swift in Sources */,
 				91E02B532C20158C00968775 /* Dependencies.swift in Sources */,
 				91E02B582C20162A00968775 /* HomeView.swift in Sources */,
