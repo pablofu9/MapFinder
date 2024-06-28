@@ -26,10 +26,7 @@ struct WeatherDetail: View {
         NavigationStack {
             VStack {
                 currentHour
-              
                 scrollHours
-                   
-  
             }
             .frame(maxHeight: .infinity, alignment: .top)
             .toolbar {
@@ -41,16 +38,23 @@ struct WeatherDetail: View {
         }
     }
     
+   
+}
+
+extension WeatherDetail {
+    
     // MARK: - Subviews
     /// Logo icon
     @ViewBuilder
-    private var LottieIcon: some View {
-        LottieView(animation: .named("SunRain"))
+    private func LottieIcon(temperature: Double,  precipitation: Int? = nil) ->  some View {
+        
+        LottieView(animation: .named(temperature > 25 ? "sun" : precipitation ?? 0 < 20 ? "sunRain" : "rain"))
           .playing(loopMode: .loop)
           .opacity(0.5)
 
     }
     
+    /// Current hour view
     @ViewBuilder
     private var currentHour: some View {
         let hours = DateTimerManager.formatHours(from: weatherResponse.hourly.time)
@@ -58,8 +62,9 @@ struct WeatherDetail: View {
         let safeIndex = selectedHourIndex ?? 0
         let selectedHour = hours[safeIndex]
         let temperature = weatherResponse.hourly.temperature2m[safeIndex].rounded()
+        let precipitation = weatherResponse.hourly.precipitation_probability[safeIndex]
         ZStack {
-            LottieIcon
+            LottieIcon(temperature: temperature, precipitation: precipitation)
             
             VStack(spacing: 5) {
                 Text(place.placemark.administrativeArea ?? "")
@@ -103,6 +108,7 @@ struct WeatherDetail: View {
         }
     }
     
+    /// Scroll hours
     @ViewBuilder
     private var scrollHours: some View {
         List {
@@ -132,47 +138,21 @@ struct WeatherDetail: View {
                             .foregroundStyle(.black.opacity(0.5))
                             .headerProminence(.increased)
                     }
-                   
-                 
+
                 }
             }
             
         }
-        .listStyle(.inset)
+        .listStyle(.grouped)
         .scrollContentBackground(.hidden)
         .background(Color.clear.opacity(0.5).edgesIgnoringSafeArea(.all))
         .frame(maxWidth: .infinity, alignment: .top)
     }
     
+    /// Render hourly view
     @ViewBuilder
     private func renderHourlyView(time: String, temperature: Double, weatherType: WeatherType, precipitation: Int? = nil) -> some View {
-        HStack {
-            let timeFormatted = DateTimerManager.formatTime(from: time)
-            let roundedTemperature = temperature.rounded()
-            
-            Text("\(timeFormatted ?? "")")
-            Divider()
-                .frame(width: 2)
-                .background(.black.opacity(0.3))
-            Spacer()
-            VStack(spacing: 5) {
-                Image(weatherType.rawValue)
-                if let precipitation = precipitation {
-                    Text("\(precipitation)%")
-                        .foregroundStyle(.blue)
-                }
-            }
-           Spacer()
-            Text("\(Int(roundedTemperature))°C")
-        }
-        .padding(.vertical, 20)
-        .frame(maxWidth: .infinity)
-        .padding(.horizontal, 30)
-        .background {
-            RoundedRectangle(cornerRadius: 10)
-                .fill(.black.opacity(0.1))
-        }
-        .padding(.horizontal, 6)
+        WeatherRowView(time: time, temperature: temperature, weatherType: weatherType, precipitation: precipitation)
     }
 }
 
